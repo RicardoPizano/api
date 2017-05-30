@@ -1,0 +1,92 @@
+<?php
+/**
+ * Conexion a la base de datos y comprobación de conexion correta
+ */
+require_once('bd.php');
+
+
+/**
+ * funcion que regresa las secciones asi como los lugares disponibles y totales de un evento
+ */
+function getSecciones(){
+    if(isset($_GET['id'])){
+
+        // Obtencion del id del evento
+        $idEvento = $_GET['id'];
+
+        // Conexion a la base de datos
+        $con = conexion();
+
+        // Selecciona todas las secciones del evento
+        $query = "SELECT * FROM secciones s, eventos e WHERE s.eve_id = e.eve_id AND s.eve_id = ".$idEvento;
+        $select = $con -> query($query);
+
+        // Validacion de que el evento contenga secciones
+        if(($select -> num_rows) > 0){
+
+            // Creacion de array vacio que contendra todas las secciones
+            $arraySecciones = array();
+
+            // Mientras exista una seccion crea un array de la seccion y lo agrega a la variable de
+            // todas las secciones que existen
+            while($row = $select -> fetch_assoc()){
+
+                // Calculo de las entradas disponibles por seccion
+                $selectCompras = $con ->query("SELECT COUNT(ven_id) vendidas FROM ventas WHERE sec_id = ".$row['sec_id']);
+                $resultadoCompras = $selectCompras -> fetch_assoc();
+                $lugaresDisponibles = $row['sec_lugares'] - $resultadoCompras['vendidas'];
+
+                // Creacion del array con los datos de la seccion
+                $seccion = [
+                    "id" => $row['sec_id'],
+                    "nombre" => $row['sec_nombre'],
+                    "costo" => $row['sec_costo'],
+                    "lugares totales" => $row['sec_lugares'],
+                    "lugares disponibles" => $lugaresDisponibles."",
+                    "nombre del evento" => $row['eve_nombre']
+                ];
+                $arraySecciones[] = $seccion;
+            }
+
+            // Crea el array de respuesta con todos los eventos de la base de datos
+            $secciones = ["res" => "1", "secciones" => $arraySecciones];
+
+            // Creacion del JSON, cierre de la conexion a la base de datos e imprime el JSON
+            $json = json_encode($secciones);
+            $con -> close();
+            print($json);
+        }else {
+            // Respuesta en caso de que no contenga secciones el evento
+            $json = json_encode(["res" => "0", "msg" => "No se encontraron secciones del evento"]);
+            $con->close();
+            print($json);
+        }
+    }else{
+        // Respuesta en caso de que la url no contenga el id del evento
+        $json = json_encode(["res"=>"0", "msg"=>"La operación deseada no existe"]);
+        print($json);
+    }
+}
+
+/**
+ * segmento encargado de verificar que la url tenga el parametro de la accion, en caso de no tener el parametro a
+ * regresa un json con res=0 y un msg de operacion no existe en caso contrario conprueba la accion y dependiendo
+ * de la accion solicitada realiza una funcion especifrica
+ */
+if(isset($_GET['a'])){
+    $accion = $_GET['a']; // Se obtiene la accion por metodo GET
+    switch ($accion){ // Switch encargado de verificar la accion
+/*------------------------------------------------------------------------------------- OBTENCION EVENTOS ------------*/
+        case 'getSecciones':
+            getSecciones();
+            break;
+/*------------------------------------------------------------------------------------- CASO DEFAULT -----------------*/
+        default:
+            $json = json_encode(["res"=>"0", "msg"=>"La operación deseada no existe"]);
+            print($json);
+            break;
+    }
+}else{
+    $json = json_encode(["res"=>"0", "msg"=>"La operación deseada no existe"]);
+    print($json);
+}
