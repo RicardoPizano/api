@@ -298,7 +298,7 @@ function findEvento(){
             ];
 
             // Crea el array de respuesta con todos los eventos de tipo culturales de la base de datos
-            $eventos = ["res" => "1", "eventos" => $evento];
+            $eventos = ["res" => "1", "evento" => $evento];
 
             // Creacion del JSON, cierre de la conexion a la base de datos e imprime el JSON
             $json = json_encode($eventos);
