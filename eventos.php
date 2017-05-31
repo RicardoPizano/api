@@ -260,6 +260,64 @@ function getCulturales(){
 }
 
 /**
+ * Funcion encargada de regresar un JSON de un evento pos su id
+ */
+function findEvento(){
+    // Validacion de que la url contenga el valor del id
+    if(isset($_GET['id'])){
+
+        // Asignacion de la variable del id
+        $id = $_GET['id'];
+
+        // Conexion a la base de datos
+        $con = conexion();
+
+        // Selecciona todos los eventos de tipo culturales
+        $query = "SELECT * FROM eventos e, categorias c WHERE e.cat_id = c.cat_id AND e.eve_id = ".$id;
+        $select = $con -> query($query);
+
+        // Validacion de que existan eventos tipo culturales en la base de datos
+        if(($select -> num_rows) > 0){
+
+            // Obtencion de la consulta en un array
+            $row = $select -> fetch_assoc();
+
+            // Llena un array con los lementos de la consulta en otro array con el formato que regresara
+            $evento = [
+                "id" => $row['eve_id'],
+                "nombre" => $row['eve_nombre'],
+                "estado" => $row['eve_estado'],
+                "ciudad" => $row['eve_ciudad'],
+                "direccion" => $row['eve_direccion'],
+                "lugar" => $row['eve_lugar'],
+                "fecha" => $row['eve_fecha'],
+                "hora" => $row['eve_hora'],
+                "foto" => $row['eve_foto'],
+                "descripcion" => $row['eve_descripcion'],
+                "categoria" => $row['cat_nombre']
+            ];
+
+            // Crea el array de respuesta con todos los eventos de tipo culturales de la base de datos
+            $eventos = ["res" => "1", "eventos" => $evento];
+
+            // Creacion del JSON, cierre de la conexion a la base de datos e imprime el JSON
+            $json = json_encode($eventos);
+            $con -> close();
+            print($json);
+        }else{
+            // Respuesta en caso de que no haya registros del evento tipo culturales
+            $json = json_encode(["res"=>"0", "msg"=>"No hay eventos con ese id"]);
+            $con -> close();
+            print($json);
+        }
+    }else{
+        // Respuesta en caso de que no contenga id el url
+        $json = json_encode(["res"=>"0", "msg"=>"La operación deseada no existe"]);
+        print($json);
+    }
+}
+
+/**
  * segmento encargado de verificar que la url tenga el parametro de la accion, en caso de no tener el parametro a
  * regresa un json con res=0 y un msg de operacion no existe en caso contrario conprueba la accion y dependiendo
  * de la accion solicitada realiza una funcion especifrica
@@ -286,6 +344,10 @@ if(isset($_GET['a'])){
 /*------------------------------------------------------------------------------------- OBTENCION CULTURALES ---------*/
         case 'getCulturales':
             getCulturales();
+            break;
+/*------------------------------------------------------------------------------------- OBTENCION EVENTO POR ID ------*/
+        case 'findEvento':
+            findEvento();
             break;
 /*------------------------------------------------------------------------------------- CASO DEFAULT -----------------*/
         default:
