@@ -252,8 +252,8 @@ function getCulturales(){
         $con -> close();
         print($json);
     }else{
-        // Respuesta en caso de que no haya registros del evento tipo deportes
-        $json = json_encode(["res"=>"0", "msg"=>"No se encontraron eventos de tipo deportes"]);
+        // Respuesta en caso de que no haya registros del evento tipo culturales
+        $json = json_encode(["res"=>"0", "msg"=>"No se encontraron eventos de tipo culturales"]);
         $con -> close();
         print($json);
     }
