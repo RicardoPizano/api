@@ -113,7 +113,7 @@ function setUsuario(){
                     print($json);
                 } else {
                     // Respuesta en caso de que no se encuentre ningun usuario con el nombre y contraseña
-                    $json = json_encode(["res" => "0", "msg" => "Ocurrio un error al validar el registro"]);
+                    $json = json_encode(["res" => "1", "msg" => "Ocurrio un error al validar el registro"]);
                     $con->close();
                     print($json);
                 }
