@@ -142,12 +142,11 @@ function setUsuario(){
  */
 function updateUsuario(){
 	// Validacion de que la url tenga todos los parametros necesitados
-    if(isset($_GET['id'], $_GET['nom'], $_GET['cor'], $_GET['pas'], $_GET['dir'], $_GET['tel'])){
+    if(isset($_GET['id'], $_GET['nom'], $_GET['cor'], $_GET['dir'], $_GET['tel'])){
         // Obtencion de valores por metodo GET
         $id = $_GET['id'];
         $nombre = $_GET['nom'];
         $correo = $_GET['cor'];
-        $contrasena = $_GET['pas'];
         $direccion =$_GET['dir'];
         $telefono = $_GET['tel'];
 
@@ -155,56 +154,68 @@ function updateUsuario(){
         $con = conexion();
 
         // Validar existencia de usuario
-        $query = "SELECT * FROM usuarios WHERE usu_id = ".$id." AND usu_correo = '".$correo.
-            "' AND usu_contrasena = '".$contrasena."'";
+        $query = "SELECT * FROM usuarios WHERE usu_id = ".$id." AND usu_correo = '".$correo."'";
         $select = $con->query($query);
 
-        // Valida si el usuario existe en la base de datos
-        if($select -> num_rows > 0) {
+        // Validar existencia de usuario
+        $query = "SELECT * FROM usuarios WHERE usu_correo = '".$correo."'";
+        $select = $con->query($query);
+        if(count($select->fetch_assoc()) == 0) {
 
-            // Query update
-            $query = "UPDATE usuarios SET usu_nombre = '" . $nombre . "', usu_direccion = '" . $direccion .
-                "', usu_telefono = '" . $telefono .
-                "' WHERE usu_id = '".$id."'";
+            // Valida si el usuario existe en la base de datos
+            if ($select->num_rows > 0) {
 
-            // Ejecucion del query
-            $update = $con->query($query);
+                // Query update
+                $query = "UPDATE usuarios SET usu_nombre = '" . $nombre .
+                    "', usu_correo = '".$correo.
+                    "', usu_direccion = '" . $direccion .
+                    "', usu_telefono = '" . $telefono .
+                    "' WHERE usu_id = '" . $id . "'";
 
-            // Verifica que la ejecucion del query regrese true
-            if ($update) {
+                // Ejecucion del query
+                $update = $con->query($query);
 
-                // Ejecuta query el cual selecciona al usuario con los cambios realizados
-                $query = "SELECT * FROM usuarios WHERE usu_id = ".$id;
-                $select = $con->query($query);
+                // Verifica que la ejecucion del query regrese true
+                if ($update) {
 
-                // Valida que el usuario este en la base de datos
-                if ($select -> num_rows > 0) {
-                    $respuestaUsu = $select->fetch_assoc();
+                    // Ejecuta query el cual selecciona al usuario con los cambios realizados
+                    $query = "SELECT * FROM usuarios WHERE usu_id = " . $id;
+                    $select = $con->query($query);
 
-                    // Creacion de array con la informacion del usuario
-                    $usuario = [
-                        "Id" => $respuestaUsu['usu_id'],
-                        "Nombre" => $respuestaUsu['usu_nombre'],
-                        "Correo" => $respuestaUsu['usu_correo'],
-                        "Contraseña" => $respuestaUsu['usu_contrasena'],
-                        "Tipo" => $respuestaUsu['usu_tipo'],
-                        "Direccion" => $respuestaUsu['usu_direccion'],
-                        "Telefono" => $respuestaUsu['usu_telefono']
-                    ];
+                    // Valida que el usuario este en la base de datos
+                    if ($select->num_rows > 0) {
+                        $respuestaUsu = $select->fetch_assoc();
 
-                    // Creacion del JSON, cierre de la conexion a la base de datos e imprime el JSON
-                    $json = json_encode(["res" => "1", "usuario" => $usuario]);
-                    $con->close();
-                    print($json);
+                        // Creacion de array con la informacion del usuario
+                        $usuario = [
+                            "Id" => $respuestaUsu['usu_id'],
+                            "Nombre" => $respuestaUsu['usu_nombre'],
+                            "Correo" => $respuestaUsu['usu_correo'],
+                            "Contraseña" => $respuestaUsu['usu_contrasena'],
+                            "Tipo" => $respuestaUsu['usu_tipo'],
+                            "Direccion" => $respuestaUsu['usu_direccion'],
+                            "Telefono" => $respuestaUsu['usu_telefono']
+                        ];
+
+                        // Creacion del JSON, cierre de la conexion a la base de datos e imprime el JSON
+                        $json = json_encode(["res" => "1", "usuario" => $usuario]);
+                        $con->close();
+                        print($json);
+                    } else {
+                        // Respuesta en caso de que no se encuentre ningun usuario con el nombre y contraseña
+                        $json = json_encode(["res" => "1", "msg" => "Ocurrio un error al validar la actualizacion"]);
+                        $con->close();
+                        print($json);
+                    }
                 } else {
-                    // Respuesta en caso de que no se encuentre ningun usuario con el nombre y contraseña
-                    $json = json_encode(["res" => "0", "msg" => "Ocurrio un error al validar la actualizacion"]);
+                    // Respuesta en caso de que el update sea false
+                    $json = json_encode(["res" => "0", "msg" => "no se pudo actualizar el usuario"]);
                     $con->close();
                     print($json);
                 }
             } else {
-                // Respuesta en caso de que el update sea false
-                $json = json_encode(["res" => "0", "msg" => "no se pudo actualizar el usuario"]);
+                // Respuesta en caso de que ya exista un correo registrado igual
+                $json = json_encode(["res" => "0", "msg" => "Ya existe un usuario registrado con ese correo"]);
                 $con->close();
                 print($json);
             }
