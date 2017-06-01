@@ -67,6 +67,59 @@ function getVentasUsuario(){
 }
 
 /**
+ * Funcion encargada de insertar una compra de un usuario en la base de datos
+ */
+function setVenta(){
+    if(isset($_GET['idUsu'], $_GET['idSec'], $_GET['pago'])){
+
+        // Obtencion de los parametros
+        $idUsuario = $_GET['idUsu'];
+        $idSeccion = $_GET['idSec'];
+        $pago = $_GET['pago'];
+
+        // Conexion a la base de datos
+        $con = conexion();
+
+        //Validacion de lugares disponibles
+        $json = file_get_contents('http://localhost/api/secciones.php?a=getLugaresDisponibles&idSec='.$idSeccion);
+        $objeto = json_decode($json, true);
+
+        // Validacion de que haya lugares disponibles
+        if($objeto['lugares disponibles'] > 0){
+
+            // Inserta los valores en la base de datos
+            $query = "INSERT INTO ventas VALUES(DEFAULT, ".$idUsuario.", ".$idSeccion.", '".$pago."')";
+            $insert = $con -> query($query);
+
+            // Validacion de que la insercion se hizo correctamente
+            if($insert){
+
+                // Crea el array de respuesta con un mensaje de correcto
+                $respuesta = ["res" => "1", "msg" => "Se realizó la compra correctamente"];
+
+                // Creacion del JSON, cierre de la conexion a la base de datos e imprime el JSON
+                $json = json_encode($respuesta);
+                $con -> close();
+                print($json);
+            }else{
+                // Respuesta en caso de que no
+                $json = json_encode(["res" => "0", "msg" => "No se encontraron boletos comprados"]);
+                $con->close();
+                print($json);
+            }
+        }else{
+            // Respuesta en caso de que no haya lugares disponibles
+            $json = json_encode(["res"=>"0", "msg"=>"Lo sentimos pero no hay lugares disponibles para esta sección"]);
+            print($json);
+        }
+    }else{
+        // Respuesta en caso de que la url no contenga el id del usuario, id de seccion y el estado de pago
+        $json = json_encode(["res"=>"0", "msg"=>"La operación deseada no existe"]);
+        print($json);
+    }
+}
+
+/**
  * segmento encargado de verificar que la url tenga el parametro de la accion, en caso de no tener el parametro a
  * regresa un json con res=0 y un msg de operacion no existe en caso contrario conprueba la accion y dependiendo
  * de la accion solicitada realiza una funcion especifrica
@@ -74,11 +127,15 @@ function getVentasUsuario(){
 if(isset($_GET['a'])){
     $accion = $_GET['a']; // Se obtiene la accion por metodo GET
     switch ($accion){ // Switch encargado de verificar la accion
-        /*------------------------------------------------------------------------------------- OBTENCION EVENTOS ------------*/
+/*------------------------------------------------------------------------------------- OBTENCION DE VENTAS USUARIO --*/
         case 'getVentasUsuario':
             getVentasUsuario();
             break;
-        /*------------------------------------------------------------------------------------- CASO DEFAULT -----------------*/
+/*------------------------------------------------------------------------------------- INSERTAR VENTAS --------------*/
+        case 'setVenta':
+            setVenta();
+            break;
+/*------------------------------------------------------------------------------------- CASO DEFAULT -----------------*/
         default:
             $json = json_encode(["res"=>"0", "msg"=>"La operación deseada no existe"]);
             print($json);

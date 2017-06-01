@@ -4,7 +4,6 @@
  */
 require_once('bd.php');
 
-
 /**
  * funcion que regresa las secciones asi como los lugares disponibles y totales de un evento
  */
@@ -69,6 +68,54 @@ function getSecciones(){
 }
 
 /**
+ * Funcion que regresa los lugares disponibles de una seccion de un evento
+ */
+function getLugaresDisponibles(){
+    if(isset($_GET['idSec'])){
+
+        // Obtencion del id del evento
+        $idSeccion = $_GET['idSec'];
+
+        // Conexion a la base de datos
+        $con = conexion();
+
+        // Selecciona todas la seccion deceada
+        $query = "SELECT * FROM secciones WHERE sec_id = ".$idSeccion;
+        $select = $con -> query($query);
+
+        // Validacion de que la consulta tenga información
+        if(($select -> num_rows) > 0){
+
+            // Obtencion en un array la consulta
+            $row = $select -> fetch_assoc();
+
+            // Calculo de las entradas disponibles por seccion
+            $selectCompras = $con ->query("SELECT COUNT(ven_id) vendidas FROM ventas WHERE sec_id = ".$row['sec_id']);
+            $resultadoCompras = $selectCompras -> fetch_assoc();
+            $lugaresDisponibles = $row['sec_lugares'] - $resultadoCompras['vendidas'];
+
+
+            // Crea el array de respuesta con los lugares disponibles de la seccion
+            $secciones = ["res" => "1", "lugares disponibles" => $lugaresDisponibles];
+
+            // Creacion del JSON, cierre de la conexion a la base de datos e imprime el JSON
+            $json = json_encode($secciones);
+            $con -> close();
+            print($json);
+        }else {
+            // Respuesta en caso de que no exista a seccion
+            $json = json_encode(["res" => "0", "msg" => "No se encontró la sección"]);
+            $con->close();
+            print($json);
+        }
+    }else{
+        // Respuesta en caso de que la url no contenga el id del evento
+        $json = json_encode(["res"=>"0", "msg"=>"La operación deseada no existe"]);
+        print($json);
+    }
+}
+
+/**
  * segmento encargado de verificar que la url tenga el parametro de la accion, en caso de no tener el parametro a
  * regresa un json con res=0 y un msg de operacion no existe en caso contrario conprueba la accion y dependiendo
  * de la accion solicitada realiza una funcion especifrica
@@ -79,6 +126,10 @@ if(isset($_GET['a'])){
 /*------------------------------------------------------------------------------------- OBTENCION EVENTOS ------------*/
         case 'getSecciones':
             getSecciones();
+            break;
+/*------------------------------------------------------------------------------------- OBTENCION EVENTOS ------------*/
+        case 'getLugaresDisponibles':
+            getLugaresDisponibles();
             break;
 /*------------------------------------------------------------------------------------- CASO DEFAULT -----------------*/
         default:
