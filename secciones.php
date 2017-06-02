@@ -116,6 +116,49 @@ function getLugaresDisponibles(){
 }
 
 /**
+ * Funcion que ingresa una seccion a la base de datos
+ */
+function setSeccion(){
+    // Validacion de la url que contenga los vaoler necesitados
+    if(isset($_GET['nom'], $_GET['cos'], $_GET['lug'], $_GET['idEve'])){
+
+        // Asignacion de variables
+        $nombre = $_GET['nom'];
+        $costo = $_GET['cos'];
+        $lugares = $_GET['lug'];
+        $idEvento = $_GET['idEve'];
+
+        // Conexion co la base de datos
+        $con = conexion();
+
+        // Insercion en la base de datos
+        $query = "INSERT INTO secciones VALUES(DEFAULT , '".$nombre."', '".$costo."', '".$lugares."', ".$idEvento.")";
+        $insert = $con -> query($query);
+
+        //Validacion de insercion correcta
+        if($insert){
+
+            // Crea el array de respuesta con el id del evento creado
+            $respuesta = ["res" => "1", "mag" => "Se agrego correctamente la seccion"];
+
+            // Creacion del JSON, cierre de la conexion a la base de datos e imprime el JSON
+            $json = json_encode($respuesta);
+            $con -> close();
+            print($json);
+        }else{
+            // Respuesta en caso de que no se haya insertado la seccion
+            $json = json_encode(["res"=>"0", "msg"=>"No se pudo crear la seccion, intentalo nuevamente"]);
+            $con -> close();
+            print($json);
+        }
+    }else{
+        // Respuesta en caso de que la url no contenga los valores necesitados
+        $json = json_encode(["res"=>"0", "msg"=>"La operación deseada no existe"]);
+        print($json);
+    }
+}
+
+/**
  * segmento encargado de verificar que la url tenga el parametro de la accion, en caso de no tener el parametro a
  * regresa un json con res=0 y un msg de operacion no existe en caso contrario conprueba la accion y dependiendo
  * de la accion solicitada realiza una funcion especifrica
@@ -123,13 +166,17 @@ function getLugaresDisponibles(){
 if(isset($_GET['a'])){
     $accion = $_GET['a']; // Se obtiene la accion por metodo GET
     switch ($accion){ // Switch encargado de verificar la accion
-/*------------------------------------------------------------------------------------- OBTENCION EVENTOS ------------*/
+/*------------------------------------------------------------------------------------- OBTENCION DE SECCIONES -------*/
         case 'getSecciones':
             getSecciones();
             break;
-/*------------------------------------------------------------------------------------- OBTENCION EVENTOS ------------*/
+/*------------------------------------------------------------------------------------- OBTENCION LUGARES DISPONIBLES */
         case 'getLugaresDisponibles':
             getLugaresDisponibles();
+            break;
+/*------------------------------------------------------------------------------------- INSERCION DE SECCION ---------*/
+        case 'setSeccion':
+            setSeccion();
             break;
 /*------------------------------------------------------------------------------------- CASO DEFAULT -----------------*/
         default:
