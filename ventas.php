@@ -30,18 +30,24 @@ function getVentasUsuario(){
             // agrega a la variable de todas las compras que existen
             while($row = $select -> fetch_assoc()){
                 $compra = [
-                    "id venta" => $row['ven_id'],
-                    "estado de pago" => $row['ven_pago_realizado'],
-                    "id seccion" => $row['sec_id'],
-                    "nombre seccion" => $row['sec_nombre'],
+                    "id_venta" => $row['ven_id'],
+                    "estado_de_pago" => $row['ven_pago_realizado'],
+                    "id_seccion" => $row['sec_id'],
+                    "nombre_seccion" => $row['sec_nombre'],
                     "costo" => $row['sec_costo'],
-                    "id evento" => $row['eve_id'],
-                    "nombre evento" => $row['eve_nombre'],
+                    "id_evento" => $row['eve_id'],
+                    "nombre_evento" => $row['eve_nombre'],
+                    "estado" => $row['eve_estado'],
+                    "ciudad" => $row['eve_ciudad'],
+                    "direccion" => $row['eve_direccion'],
+                    "lugar" => $row['eve_lugar'],
                     "fecha" => $row['eve_fecha'],
                     "hora" => $row['eve_hora'],
-                    "nombre categoria" => $row['cat_nombre'],
-                    "id usuario" => $row['usu_id'],
-                    "correo usuario" => $row['usu_correo'],
+                    "foto" => $row['eve_foto'],
+                    "descripcion" => $row['eve_descripcion'],
+                    "nombre_categoria" => $row['cat_nombre'],
+                    "id_usuario" => $row['usu_id'],
+                    "correo_usuario" => $row['usu_correo'],
                 ];
                 $arrayVentas[] = $compra;
             }
