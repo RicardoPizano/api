@@ -270,6 +270,41 @@ function infoUsuario(){
 }
 
 /**
+ * Funcion encargada de eliminar a un usuario por su id
+ */
+function deleteUsuario(){
+    if(isset($_GET['id'])){
+        // Obtencion de valores por metodo GET
+        $id = $_GET['id'];
+
+        // Conexion a la base de datos
+        $con = conexion();
+
+        // Validar existencia de usuario
+        $query = "DELETE FROM usuarios WHERE usu_id = ".$id;
+        $delete = $con->query($query);
+
+        // Comprueba que el resultado no sea vacio
+        if($delete) {
+
+            // Creacion del JSON, cierre de la conexion a la base de datos e imprime el JSON
+            $json = json_encode(["res" => "1", "msg" => "Se elimino correctamente el usuario"]);
+            $con->close();
+            print($json);
+        }else{
+            // Respuesta en caso de que no se pudo eliminar el usuario
+            $con->close();
+            $json = json_encode(["res" => "0", "msg"=>"Ocurrio un error inesperado, vuelva a intentar"]);
+            print($json);
+        }
+    }else{
+        // Respuesta en caso de que no contenga todos los datos necesarios la url
+        $json = json_encode(["res" => "0", "msg"=>"La operación deseada no existe"]);
+        print($json);
+    }
+}
+
+/**
  * segmento encargado de verificar que la url tenga el parametro de la accion, en caso de no tener el parametro a
  * regresa un json con res=0 y un msg de operacion no existe en caso contrario conprueba la accion y dependiendo
  * de la accion solicitada realiza una funcion especifrica
@@ -289,9 +324,13 @@ if(isset($_GET['a'])){
         case 'updateUsuario':
             updateUsuario();
             break;
-/*------------------------------------------------------------------------------------- ACTUALIZACION DE USUARIO -----*/
+/*------------------------------------------------------------------------------------- AINFORMACION DE USUARIO ------*/
         case 'infoUsuario':
             infoUsuario();
+            break;
+/*------------------------------------------------------------------------------------- ELIMINAR DE USUARIO -----*/
+        case 'deletUsuario':
+            deleteUsuario();
             break;
 /*------------------------------------------------------------------------------------- CASO DEFAULT -----------------*/
         default:
