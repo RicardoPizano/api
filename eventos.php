@@ -322,7 +322,7 @@ function findEvento(){
  */
 function setEvento(){
     // Validacion de que el url contenga todos los elementos del evento
-    if(iseet($_GET['nom'], $_GET['est'], $_GET['ciu'], $_GET['dir'], $_GET['lug'], $_GET['fec'],
+    if(isset($_GET['nom'], $_GET['est'], $_GET['ciu'], $_GET['dir'], $_GET['lug'], $_GET['fec'],
         $_GET['hor'], $_GET['img'], $_GET['des'], $_GET['cat'])){
 
         //Asignacion de las variables del url
@@ -375,7 +375,7 @@ function setEvento(){
             }
         }else{
             // Respuesta en caso de que no se haya insertado el evento
-            $json = json_encode(["res"=>"0", "msg"=>"No se pudo crear el evento, intentalo nuevamente"]);
+            $json = json_encode(["res"=>"0", "msg"=>"No se pudo crear el evento, intentalo nuevamente ".$con->error]);
             $con -> close();
             print($json);
         }
