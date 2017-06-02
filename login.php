@@ -329,7 +329,7 @@ if(isset($_GET['a'])){
             infoUsuario();
             break;
 /*------------------------------------------------------------------------------------- ELIMINAR DE USUARIO -----*/
-        case 'deletUsuario':
+        case 'deleteUsuario':
             deleteUsuario();
             break;
 /*------------------------------------------------------------------------------------- CASO DEFAULT -----------------*/
