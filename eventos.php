@@ -318,6 +318,75 @@ function findEvento(){
 }
 
 /**
+ * Funcion que inserta un evento a la base de datos
+ */
+function setEvento(){
+    // Validacion de que el url contenga todos los elementos del evento
+    if(iseet($_GET['nom'], $_GET['est'], $_GET['ciu'], $_GET['dir'], $_GET['lug'], $_GET['fec'],
+        $_GET['hor'], $_GET['img'], $_GET['des'], $_GET['cat'])){
+
+        //Asignacion de las variables del url
+        $nombre = $_GET['nom'];
+        $estado = $_GET['est'];
+        $ciudad = $_GET['ciu'];
+        $direccion = $_GET['dir'];
+        $lugar = $_GET['lug'];
+        $fecha = $_GET['fec'];
+        $hora = $_GET['hor'];
+        $imagen = $_GET['img'];
+        $descripcion = $_GET['des'];
+        $idCategoria = $_GET['cat'];
+
+        // Conexion a la base de datos
+        $con = conexion();
+
+        // Insercion en la base de datos el evento nuevo
+        $query = "INSERT INTO eventos VALUES(DEFAULT, '".$nombre."', '".$estado."', '".$ciudad."', '".
+            $direccion."', '".$lugar."', '".$fecha."', '".$hora."', '".$imagen."', '".
+            $descripcion."', ".$idCategoria." )";
+        $insert = $con -> query($query);
+
+        //Validacion de insercion correcta
+        if($insert){
+
+            // Seleccion del evento recien creado
+            $query = "SELECT eve_id FROM eventos WHERE eve_nombre = '".$nombre."' AND eve_estado = '".$estado.
+                "' AND eve_ciudad = '".$ciudad."' AND eve_direccion = '".$direccion."'";
+            $select = $con -> query($query);
+
+            //Validacion de que la seleccion se hizo correctamente
+            if($select -> num_rows > 0){
+
+                // Obtencion de la consulta en un array
+                $row = $select -> fetch_assoc();
+
+                // Crea el array de respuesta con el id del evento creado
+                $evento = ["res" => "1", "id" => $row['eve_id']];
+
+                // Creacion del JSON, cierre de la conexion a la base de datos e imprime el JSON
+                $json = json_encode($evento);
+                $con -> close();
+                print($json);
+            }else{
+                // Respuesta en caso de que no se encuentre ningun evento con la informacion obtenida
+                $json = json_encode(["res" => "0", "msg" => "Ocurrio un error al validar el evento"]);
+                $con->close();
+                print($json);
+            }
+        }else{
+            // Respuesta en caso de que no se haya insertado el evento
+            $json = json_encode(["res"=>"0", "msg"=>"No se pudo crear el evento, intentalo nuevamente"]);
+            $con -> close();
+            print($json);
+        }
+    }else{
+        // Respuesta en caso de que no contenga todos los datos el url
+        $json = json_encode(["res"=>"0", "msg"=>"La operación deseada no existe"]);
+        print($json);
+    }
+}
+
+/**
  * segmento encargado de verificar que la url tenga el parametro de la accion, en caso de no tener el parametro a
  * regresa un json con res=0 y un msg de operacion no existe en caso contrario conprueba la accion y dependiendo
  * de la accion solicitada realiza una funcion especifrica
@@ -348,6 +417,10 @@ if(isset($_GET['a'])){
 /*------------------------------------------------------------------------------------- OBTENCION EVENTO POR ID ------*/
         case 'findEvento':
             findEvento();
+            break;
+/*------------------------------------------------------------------------------------- OBTENCION EVENTO POR ID ------*/
+        case 'setEvento':
+            setEvento();
             break;
 /*------------------------------------------------------------------------------------- CASO DEFAULT -----------------*/
         default:
