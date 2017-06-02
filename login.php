@@ -233,6 +233,54 @@ function updateUsuario(){
 }
 
 /**
+ * Funcion encargada de verificar el usuario y contraseña de un usuario para regresar la informacion del usuario
+ */
+function infoUsuario(){
+    if(isset($_GET['cor'], $_GET['pas'])){
+        // Obtencion de valores por metodo GET
+        $correo = $_GET['cor'];
+        $contrasena = $_GET['pas'];
+
+        // Conexion a la base de datos
+        $con = conexion();
+
+        // Validar existencia de usuario
+        $query = "SELECT * FROM usuarios WHERE usu_correo = '".$correo."' AND usu_contrasena = '".$contrasena."'";
+        $select = $con->query($query);
+
+        // Comprueba que el resultado no sea vacio
+        if($select -> num_rows > 0) {
+            $respuestaUsu = $select->fetch_assoc();
+
+            // Creacion de array con la informacion del usuario
+            $usuario = [
+                "Id" => $respuestaUsu['usu_id'],
+                "Nombre" => $respuestaUsu['usu_nombre'],
+                "Correo" => $respuestaUsu['usu_correo'],
+                "Contraseña" => $respuestaUsu['usu_contrasena'],
+                "Tipo" => $respuestaUsu['usu_tipo'],
+                "Direccion" => $respuestaUsu['usu_direccion'],
+                "Telefono" => $respuestaUsu['usu_telefono']
+            ];
+
+            // Creacion del JSON, cierre de la conexion a la base de datos e imprime el JSON
+            $json = json_encode(["res" => "1", "usuario" => $usuario]);
+            $con->close();
+            print($json);
+        }else{
+            // Respuesta en caso de que no exista el usuario
+            $con->close();
+            $json = json_encode(["res"=>"0", "msg"=>"Usuario o contraseña incorrectos"]);
+            print($json);
+        }
+    }else{
+        // Respuesta en caso de que no contenga todos los datos necesarios la url
+        $json = json_encode(["res"=>"0", "msg"=>"La operación deseada no existe"]);
+        print($json);
+    }
+}
+
+/**
  * segmento encargado de verificar que la url tenga el parametro de la accion, en caso de no tener el parametro a
  * regresa un json con res=0 y un msg de operacion no existe en caso contrario conprueba la accion y dependiendo
  * de la accion solicitada realiza una funcion especifrica
@@ -251,6 +299,10 @@ if(isset($_GET['a'])){
 /*------------------------------------------------------------------------------------- ACTUALIZACION DE USUARIO -----*/
         case 'updateUsuario':
             updateUsuario();
+            break;
+/*------------------------------------------------------------------------------------- ACTUALIZACION DE USUARIO -----*/
+        case 'infoUsuario':
+            infoUsuario();
             break;
 /*------------------------------------------------------------------------------------- CASO DEFAULT -----------------*/
         default:
