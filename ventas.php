@@ -109,7 +109,7 @@ function setVenta(){
                 print($json);
             }else{
                 // Respuesta en caso de que no
-                $json = json_encode(["res" => "0", "msg" => "No se encontraron boletos comprados"]);
+                $json = json_encode(["res" => "0", "msg" => "No se pudo realizar la compra, intente nuevamente"]);
                 $con->close();
                 print($json);
             }
