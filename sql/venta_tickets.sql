@@ -34,6 +34,16 @@ CREATE TABLE `categorias` (
   `cat_descripcion` varchar(255) COLLATE utf8_spanish2_ci DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish2_ci;
 
+--
+-- Volcado de datos para la tabla `categorias`
+--
+
+INSERT INTO `categorias` (`cat_id`, `cat_nombre`, `cat_descripcion`) VALUES
+(1, 'Concierto', ''),
+(2, 'Teatro', ''),
+(3, 'Deportes', ''),
+(4, 'Culturales', '');
+
 -- --------------------------------------------------------
 
 --
