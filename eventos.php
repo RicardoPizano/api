@@ -493,7 +493,7 @@ function getTodoEventos(){
         print($json);
     }else{
         // Respuesta en caso de que no haya registros de eventos
-        $json = json_encode(["res"=>"0", "msg"=>"La operación deseada no existe"]);
+        $json = json_encode(["res"=>"0", "msg"=>"No se encontro ningun evento"]);
         $con -> close();
         print($json);
     }
