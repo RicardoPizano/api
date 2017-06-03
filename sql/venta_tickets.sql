@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: localhost
--- Tiempo de generación: 30-05-2017 a las 17:21:39
+-- Tiempo de generación: 03-06-2017 a las 02:53:12
 -- Versión del servidor: 10.1.21-MariaDB
 -- Versión de PHP: 5.6.30
 
@@ -34,16 +34,6 @@ CREATE TABLE `categorias` (
   `cat_descripcion` varchar(255) COLLATE utf8_spanish2_ci DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish2_ci;
 
---
--- Volcado de datos para la tabla `categorias`
---
-
-INSERT INTO `categorias` (`cat_id`, `cat_nombre`, `cat_descripcion`) VALUES
-(1, 'Concierto', ''),
-(2, 'Teatro', ''),
-(3, 'Deportes', ''),
-(4, 'Culturales', '');
-
 -- --------------------------------------------------------
 
 --
@@ -64,13 +54,6 @@ CREATE TABLE `eventos` (
   `cat_id` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish2_ci;
 
---
--- Volcado de datos para la tabla `eventos`
---
-
-INSERT INTO `eventos` (`eve_id`, `eve_nombre`, `eve_estado`, `eve_ciudad`, `eve_direccion`, `eve_lugar`, `eve_fecha`, `eve_hora`, `eve_foto`, `eve_descripcion`, `cat_id`) VALUES
-(1, 'Boletos para The Legend Of Zelda Symphony Of The Goddesses', 'CDMX', 'CDMX', 'Paseo de la Reforma # 50 Col Polanco V Sección, Del. Miguel Hidalgo,  Ciudad de México,  DF  11560', 'Auditorio Nacional', '2017-06-11', '18:00', 'http://s1.ticketm.net/tm/es-mx/dam/a/079/57dcff16-1feb-4e28-ac77-1548c4d77079_362471_CUSTOM.jpg', 'Es un excelente e imperdible concierto para cualquier fan de the legend of zelda, abarcando la mayoría de las aventuras vividas en los videojuegos y recordando los momentos mas simpáticos, épicos, tristes y divertidos. Combinando una orquesta de talla mun', 1);
-
 -- --------------------------------------------------------
 
 --
@@ -84,15 +67,6 @@ CREATE TABLE `secciones` (
   `sec_lugares` int(5) DEFAULT NULL,
   `eve_id` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish2_ci;
-
---
--- Volcado de datos para la tabla `secciones`
---
-
-INSERT INTO `secciones` (`sec_id`, `sec_nombre`, `sec_costo`, `sec_lugares`, `eve_id`) VALUES
-(1, 'General', '1500.00', 200, 1),
-(2, 'VIP', '500.00', 50, 1),
-(3, 'Palcos', '2500.00', 100, 1);
 
 -- --------------------------------------------------------
 
@@ -110,14 +84,6 @@ CREATE TABLE `usuarios` (
   `usu_telefono` varchar(15) COLLATE utf8_spanish2_ci DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish2_ci;
 
---
--- Volcado de datos para la tabla `usuarios`
---
-
-INSERT INTO `usuarios` (`usu_id`, `usu_nombre`, `usu_correo`, `usu_contrasena`, `usu_tipo`, `usu_direccion`, `usu_telefono`) VALUES
-(1, 'Ricardo Antonio Pizano Pérez', 'rikymon2@hotmail.com', '827ccb0eea8a706c4c34a16891f84e7b', 'a', '', ''),
-(2, 'Maria Monica Sánchez Martínez', 'monica@hotmail.com', '827ccb0eea8a706c4c34a16891f84e7b', 'u', 'Col. centro Prospero C. vega No.57', '4424655796');
-
 -- --------------------------------------------------------
 
 --
@@ -130,13 +96,6 @@ CREATE TABLE `ventas` (
   `sec_id` int(11) NOT NULL,
   `ven_pago_realizado` varchar(1) COLLATE utf8_spanish2_ci DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish2_ci;
-
---
--- Volcado de datos para la tabla `ventas`
---
-
-INSERT INTO `ventas` (`ven_id`, `usu_id`, `sec_id`, `ven_pago_realizado`) VALUES
-(1, 1, 1, '1');
 
 -- --------------------------------------------------------
 
@@ -152,8 +111,14 @@ CREATE TABLE `ver_ventas_usuario` (
 ,`sec_costo` decimal(10,2)
 ,`eve_id` int(11)
 ,`eve_nombre` varchar(100)
+,`eve_estado` varchar(50)
+,`eve_ciudad` varchar(50)
+,`eve_direccion` varchar(100)
+,`eve_lugar` varchar(100)
 ,`eve_fecha` date
 ,`eve_hora` varchar(30)
+,`eve_foto` varchar(255)
+,`eve_descripcion` text
 ,`cat_nombre` varchar(50)
 ,`usu_id` int(11)
 ,`usu_correo` varchar(100)
@@ -166,7 +131,7 @@ CREATE TABLE `ver_ventas_usuario` (
 --
 DROP TABLE IF EXISTS `ver_ventas_usuario`;
 
-CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `ver_ventas_usuario`  AS  select `v`.`ven_id` AS `ven_id`,`v`.`ven_pago_realizado` AS `ven_pago_realizado`,`s`.`sec_id` AS `sec_id`,`s`.`sec_nombre` AS `sec_nombre`,`s`.`sec_costo` AS `sec_costo`,`e`.`eve_id` AS `eve_id`,`e`.`eve_nombre` AS `eve_nombre`,`e`.`eve_fecha` AS `eve_fecha`,`e`.`eve_hora` AS `eve_hora`,`c`.`cat_nombre` AS `cat_nombre`,`u`.`usu_id` AS `usu_id`,`u`.`usu_correo` AS `usu_correo` from ((((`ventas` `v` join `secciones` `s`) join `usuarios` `u`) join `eventos` `e`) join `categorias` `c`) where ((`v`.`sec_id` = `s`.`sec_id`) and (`v`.`usu_id` = `u`.`usu_id`) and (`s`.`eve_id` = `e`.`eve_id`) and (`e`.`cat_id` = `c`.`cat_id`)) ;
+CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `ver_ventas_usuario`  AS  select `v`.`ven_id` AS `ven_id`,`v`.`ven_pago_realizado` AS `ven_pago_realizado`,`s`.`sec_id` AS `sec_id`,`s`.`sec_nombre` AS `sec_nombre`,`s`.`sec_costo` AS `sec_costo`,`e`.`eve_id` AS `eve_id`,`e`.`eve_nombre` AS `eve_nombre`,`e`.`eve_estado` AS `eve_estado`,`e`.`eve_ciudad` AS `eve_ciudad`,`e`.`eve_direccion` AS `eve_direccion`,`e`.`eve_lugar` AS `eve_lugar`,`e`.`eve_fecha` AS `eve_fecha`,`e`.`eve_hora` AS `eve_hora`,`e`.`eve_foto` AS `eve_foto`,`e`.`eve_descripcion` AS `eve_descripcion`,`c`.`cat_nombre` AS `cat_nombre`,`u`.`usu_id` AS `usu_id`,`u`.`usu_correo` AS `usu_correo` from ((((`ventas` `v` join `secciones` `s`) join `usuarios` `u`) join `eventos` `e`) join `categorias` `c`) where ((`v`.`sec_id` = `s`.`sec_id`) and (`v`.`usu_id` = `u`.`usu_id`) and (`s`.`eve_id` = `e`.`eve_id`) and (`e`.`cat_id` = `c`.`cat_id`)) ;
 
 --
 -- Índices para tablas volcadas
@@ -219,22 +184,22 @@ ALTER TABLE `categorias`
 -- AUTO_INCREMENT de la tabla `eventos`
 --
 ALTER TABLE `eventos`
-  MODIFY `eve_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `eve_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=23;
 --
 -- AUTO_INCREMENT de la tabla `secciones`
 --
 ALTER TABLE `secciones`
-  MODIFY `sec_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `sec_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
 --
 -- AUTO_INCREMENT de la tabla `usuarios`
 --
 ALTER TABLE `usuarios`
-  MODIFY `usu_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `usu_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 --
 -- AUTO_INCREMENT de la tabla `ventas`
 --
 ALTER TABLE `ventas`
-  MODIFY `ven_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `ven_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 --
 -- Restricciones para tablas volcadas
 --
