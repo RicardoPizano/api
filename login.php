@@ -209,8 +209,8 @@ function updateUsuario(){
                 print($json);
             }
         } else {
-            // Respuesta en caso de que ya exista un correo registrado igual
-            $json = json_encode(["res" => "0", "msg" => "Ya existe un usuario registrado con ese correo"]);
+            // Respuesta en caso de que no exista el usuario
+            $json = json_encode(["res" => "0", "msg" => "No existe el usuario"]);
             $con->close();
             print($json);
         }
