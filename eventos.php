@@ -375,7 +375,7 @@ function setEvento(){
             }
         }else{
             // Respuesta en caso de que no se haya insertado el evento
-            $json = json_encode(["res"=>"0", "msg"=>"No se pudo crear el evento, intentalo nuevamente ".$con->error]);
+            $json = json_encode(["res"=>"0", "msg"=>"No se pudo crear el evento, intentalo nuevamente"]);
             $con -> close();
             print($json);
         }
