@@ -139,7 +139,7 @@ function setSeccion(){
         if($insert){
 
             // Crea el array de respuesta con el id del evento creado
-            $respuesta = ["res" => "1", "mag" => "Se agrego correctamente la seccion"];
+            $respuesta = ["res" => "1", "msg" => "Se agrego correctamente la seccion"];
 
             // Creacion del JSON, cierre de la conexion a la base de datos e imprime el JSON
             $json = json_encode($respuesta);
