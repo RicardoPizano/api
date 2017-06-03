@@ -12,7 +12,7 @@ function getEventos(){
     $con = conexion();
 
     // Selecciona todos los eventos
-    $query = "SELECT * FROM eventos e, categorias c WHERE e.cat_id = c.cat_id";
+    $query = "SELECT * FROM eventos e, categorias c WHERE e.cat_id = c.cat_id AND NOW() <= e.eve_fecha";
     $select = $con -> query($query);
 
     // Validacion de que existan eventos en la base de datos
@@ -63,7 +63,7 @@ function getConciertos(){
     $con = conexion();
 
     // Selecciona todos los eventos de tipo concierto
-    $query = "SELECT * FROM eventos e, categorias c WHERE e.cat_id = c.cat_id AND c.cat_id = 1";
+    $query = "SELECT * FROM eventos e, categorias c WHERE e.cat_id = c.cat_id AND NOW() <= e.eve_fecha AND c.cat_id = 1";
     $select = $con -> query($query);
 
     // Validacion de que existan eventos tipo concierto en la base de datos
@@ -114,7 +114,7 @@ function getTeatro(){
     $con = conexion();
 
     // Selecciona todos los eventos de tipo teatro
-    $query = "SELECT * FROM eventos e, categorias c WHERE e.cat_id = c.cat_id AND c.cat_id = 2";
+    $query = "SELECT * FROM eventos e, categorias c WHERE e.cat_id = c.cat_id AND NOW() <= e.eve_fecha AND c.cat_id = 2";
     $select = $con -> query($query);
 
     // Validacion de que existan eventos tipo teatro en la base de datos
@@ -165,7 +165,7 @@ function getDeportes(){
     $con = conexion();
 
     // Selecciona todos los eventos de tipo deportes
-    $query = "SELECT * FROM eventos e, categorias c WHERE e.cat_id = c.cat_id AND c.cat_id = 3";
+    $query = "SELECT * FROM eventos e, categorias c WHERE e.cat_id = c.cat_id AND NOW() <= e.eve_fecha AND c.cat_id = 3";
     $select = $con -> query($query);
 
     // Validacion de que existan eventos tipo deportes en la base de datos
@@ -216,7 +216,7 @@ function getCulturales(){
     $con = conexion();
 
     // Selecciona todos los eventos de tipo culturales
-    $query = "SELECT * FROM eventos e, categorias c WHERE e.cat_id = c.cat_id AND c.cat_id = 3";
+    $query = "SELECT * FROM eventos e, categorias c WHERE e.cat_id = c.cat_id AND NOW() <= e.eve_fecha AND c.cat_id = 3";
     $select = $con -> query($query);
 
     // Validacion de que existan eventos tipo culturales en la base de datos
@@ -273,7 +273,7 @@ function findEvento(){
         $con = conexion();
 
         // Selecciona todos los eventos de tipo culturales
-        $query = "SELECT * FROM eventos e, categorias c WHERE e.cat_id = c.cat_id AND e.eve_id = ".$id;
+        $query = "SELECT * FROM eventos e, categorias c WHERE e.cat_id = c.cat_id AND NOW() <= e.eve_fecha AND e.eve_id = ".$id;
         $select = $con -> query($query);
 
         // Validacion de que existan eventos tipo culturales en la base de datos
@@ -400,7 +400,7 @@ function findEventoPalabra(){
         $con = conexion();
 
         // Selecciona todos los eventos que contengan la palabra enviada
-        $query = "SELECT * FROM eventos e, categorias c WHERE e.cat_id = c.cat_id AND (e.eve_nombre LIKE '%".$palabra."%')";
+        $query = "SELECT * FROM eventos e, categorias c WHERE e.cat_id = c.cat_id AND NOW() <= e.eve_fecha AND (e.eve_nombre LIKE '%".$palabra."%')";
         $select = $con -> query($query);
 
         // Validacion de que existan eventos con la palabra en la base de datos
@@ -449,6 +449,57 @@ function findEventoPalabra(){
 }
 
 /**
+ * Funcion que regresa todos los eventos de la base de datos
+ */
+function getTodoEventos(){
+    // Conexion a la base de datos
+    $con = conexion();
+
+    // Selecciona todos los eventos
+    $query = "SELECT * FROM eventos e, categorias c WHERE e.cat_id = c.cat_id";
+    $select = $con -> query($query);
+
+    // Validacion de que existan eventos en la base de datos
+    if(($select -> num_rows) > 0){
+
+        // Creacion de array vacio que contendra todos los eventos
+        $arrayEventos = array();
+
+        // Mientras exista un evento crea un array del evento y lo agrega a la variable de
+        // toso lso eventos que existen
+        while($row = $select->fetch_assoc()){
+            $evento = [
+                "id" => $row['eve_id'],
+                "nombre" => $row['eve_nombre'],
+                "estado" => $row['eve_estado'],
+                "ciudad" => $row['eve_ciudad'],
+                "direccion" => $row['eve_direccion'],
+                "lugar" => $row['eve_lugar'],
+                "fecha" => $row['eve_fecha'],
+                "hora" => $row['eve_hora'],
+                "foto" => $row['eve_foto'],
+                "descripcion" => $row['eve_descripcion'],
+                "categoria" => $row['cat_nombre']
+            ];
+            $arrayEventos[] = $evento;
+        }
+
+        // Crea el array de respuesta con todos los eventos de la base de datos
+        $eventos = ["res" => "1", "eventos" => $arrayEventos];
+
+        // Creacion del JSON, cierre de la conexion a la base de datos e imprime el JSON
+        $json = json_encode($eventos);
+        $con -> close();
+        print($json);
+    }else{
+        // Respuesta en caso de que no haya registros de eventos
+        $json = json_encode(["res"=>"0", "msg"=>"La operación deseada no existe"]);
+        $con -> close();
+        print($json);
+    }
+}
+
+/**
  * segmento encargado de verificar que la url tenga el parametro de la accion, en caso de no tener el parametro a
  * regresa un json con res=0 y un msg de operacion no existe en caso contrario conprueba la accion y dependiendo
  * de la accion solicitada realiza una funcion especifrica
@@ -487,6 +538,10 @@ if(isset($_GET['a'])){
 /*------------------------------------------------------------------------------------- OBTENCION EVENTO POR ID ------*/
         case 'findEventoPalabra':
             findEventoPalabra();
+            break;
+/*------------------------------------------------------------------------------------- OBTENCION EVENTO POR ID ------*/
+        case 'getTodoEventos':
+            getTodoEventos();
             break;
 /*------------------------------------------------------------------------------------- CASO DEFAULT -----------------*/
         default:
