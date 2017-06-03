@@ -216,7 +216,7 @@ function getCulturales(){
     $con = conexion();
 
     // Selecciona todos los eventos de tipo culturales
-    $query = "SELECT * FROM eventos e, categorias c WHERE e.cat_id = c.cat_id AND NOW() <= e.eve_fecha AND c.cat_id = 3";
+    $query = "SELECT * FROM eventos e, categorias c WHERE e.cat_id = c.cat_id AND NOW() <= e.eve_fecha AND c.cat_id = 4";
     $select = $con -> query($query);
 
     // Validacion de que existan eventos tipo culturales en la base de datos
